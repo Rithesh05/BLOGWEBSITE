@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Details Enter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .main1 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .img {
+            height: 50vh;
+            width: 100%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .main1 h2 {
+            color: #4CAF50;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .main1 p {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .form h2 {
+            align-self: flex-start;
+            color: #333;
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        .form input[type="file"],
+        .form input[type="text"] {
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .form button:hover {
+            background-color: #45a049;
+        }
+
+        #photo {
+            display: none;
+            margin-top: 10px;
+            width: 100px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>BLOGS</h1>
+    <div class="main">
+        <% for (let i = 0; i < data.length; i++) { %>
+            <div class="main1">
+                <h2><%= data[i].name %></h2>
+                <img src="<%= data[i].pic %>" alt="Photo" class="img">
+                <p><%= data[i].description %></p>
+            </div>
+        <% } %>
+    </div>
+
+    <form onsubmit="oncl(event)" class="form">
+        <h2>UPLOAD FILE:</h2>
+        <input type="file" id="file" required>
+        <h2>NAME:</h2>
+        <input type="text" id="name" required>
+        <h2>DESCRIPTION:</h2>
+        <input type="text" id="description" required>
+        <img src="" alt="photo" id="photo" name="photo">
+        <button type="submit">UPLOAD</button>
+    </form>
+
+    <script>
+        function oncl(event) {
+            event.preventDefault();
+            
+            const fileInput = document.getElementById("file");
+            const photo = document.getElementById("photo");
+            const name = document.getElementById("name");
+            const description = document.getElementById("description");
+
+            if (fileInput.files.length === 0) {
+                console.log("No file selected.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const filereader = new FileReader();
+            
+            filereader.onload = function() {
+                const result = filereader.result;
+                photo.src = result;
+                photo.style.display = "block";
+
+                fetch("/submit", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ data: result, name: name.value, descrip: description.value })
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+            };
+            
+            filereader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
